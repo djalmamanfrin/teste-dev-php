@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'api_brazil' => [
+        'host' => env('API_BRAZIL_HOST'),
+    ],
+
 ];
