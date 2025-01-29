@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Supplier;
+use Database\Factories\CNPJFactory;
+use Database\Factories\CPFFactory;
 use Database\Factories\SupplierFactory;
 use Illuminate\Http\Response;
 
@@ -49,7 +51,7 @@ it('can create supplier', function () {
 
     $data = [
         'name' => 'Supplier Test',
-        'identifier' => (new SupplierFactory())->generateCNPJ(),
+        'identifier' => CNPJFactory::valid(),
         'contact' => '123456789',
         'address' => [
             'street' => 'Street Test',
@@ -82,7 +84,7 @@ it('can update supplier', function () {
     $supplier = Supplier::factory()->create();
     $data = [
         'name' => 'Updated Supplier',
-        'identifier' => (new SupplierFactory())->generateCNPJ(),
+        'identifier' => CPFFactory::valid(),
         'contact' => '987654321',
         'address' => [
             'street' => 'Updated Street',
