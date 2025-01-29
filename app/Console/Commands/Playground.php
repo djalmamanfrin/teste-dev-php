@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Services\ApiBrazil\APIBrazilService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
 
 class Playground extends Command
 {
@@ -26,8 +26,9 @@ class Playground extends Command
      */
     public function handle()
     {
-        $data = Http::get('https://brasilapi.com.br/api/cnpj/v1/19131243000197');
-        $json = $data->json();
-        dd($json);
+        $apiBrazil = new APIBrazilService();
+        $cnpj = $apiBrazil->cnpj()->get('19131243000197');
+        $cep = $apiBrazil->cepV2()->get('89010025');
+        dd($cnpj, $cep);
     }
 }

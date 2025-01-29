@@ -79,7 +79,7 @@ it('can show supplier', function () {
     $response->assertJsonFragment(['name' => $supplier->name]);
 })->group('supplier-controller');
 
-it('can update supplier', function () {
+it('can update supplier and address', function () {
 
     $supplier = Supplier::factory()->create();
     $data = [

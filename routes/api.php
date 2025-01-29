@@ -8,7 +8,7 @@ Route::prefix('suppliers')
     ->group(function () {
         Route::get('/', [SupplierController::class, 'index']);
         Route::post('/', [SupplierController::class, 'store']);
-        Route::get('{id}', [SupplierController::class, 'show']);
-        Route::put('{id}', [SupplierController::class, 'update']);
-        Route::delete('{id}', [SupplierController::class, 'destroy']);
+        Route::get('{supplier}', [SupplierController::class, 'show']);
+        Route::put('{supplier}', [SupplierController::class, 'update']);
+        Route::delete('{supplier}', [SupplierController::class, 'destroy']);
     });
