@@ -12,11 +12,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('suppliers', function (Blueprint $table) {
-            $table->id(); // id da tabela
-            $table->string('name'); // nome do fornecedor
-            $table->string('identifier')->unique(); // identificador único do fornecedor (ex: CNPJ ou CPF)
-            $table->string('contact'); // campo de contato do fornecedor (telefone, email, etc.)
-            $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
+            $table->id();
+            $table->string('name');
+            $table->string('identifier')->unique();
+            $table->string('contact');
+            $table->foreignId('address_id')->nullable()->constrained('addresses')->nullOnDelete();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
             $table->softDeletes();
