@@ -2,25 +2,23 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\CnpjCpf;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use App\Rules\CPF_CNPJ;
+use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 
 class SupplierRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return true;
+    }
     public function rules(): array
     {
-        $id = $this->route('supplier');
-
         return [
             'name' => 'required|string|max:255',
-            'identifier' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('suppliers', 'identifier')->ignore($id),
-                new CPF_CNPJ(),
-            ],
+            'identifier' => ['required', new CnpjCpf(), 'unique:suppliers,identifier'],
             'contact' => 'required|string|max:255',
             'address.street' => 'nullable|string|max:255',
             'address.number' => 'nullable|string|max:255',
@@ -30,6 +28,14 @@ class SupplierRequest extends FormRequest
             'address.postal_code' => 'nullable|string|max:255',
             'address.country' => 'nullable|string|max:255',
         ];
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        throw new ValidationException(
+            $validator,
+            response()->json($validator->errors(), Response::HTTP_UNPROCESSABLE_ENTITY)
+        );
     }
 }
 

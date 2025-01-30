@@ -3,14 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SupplierRequest;
-use App\Models\Address;
 use App\Models\Supplier;
+use App\Rules\CnpjCpf;
+use App\Rules\CPF_CNPJ;
+use App\Services\SupplierService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class SupplierController extends Controller
 {
+    protected SupplierService $service;
+
+    public function __construct(SupplierService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->input('per_page', 10);
@@ -21,15 +30,13 @@ class SupplierController extends Controller
 
     public function store(SupplierRequest $request): JsonResponse
     {
-        $validatedData = $request->validated();
-        $supplier = Supplier::create($validatedData);
-        if (!empty($validatedData['address'])) {
-            $address = Address::create($validatedData['address']);
-            $supplier->address()->associate($address);
-            $supplier->save();
+        try {
+            $data = $request->validated();
+            $supplier = $this->service->store($data);
+            return response()->json($supplier, Response::HTTP_CREATED);
+        } catch (\Throwable $exception) {
+            return response()->json($exception->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-
-        return response()->json($supplier, Response::HTTP_CREATED);
     }
 
     public function show(Supplier $supplier): JsonResponse
@@ -40,28 +47,18 @@ class SupplierController extends Controller
 
     public function update(SupplierRequest $request, Supplier $supplier): JsonResponse
     {
-        $validatedData = $request->validated();
-        $supplier->update($validatedData);
-
-        if (!empty($validatedData['address'])) {
-            if (empty($supplier->address)) {
-                $address = Address::create($validatedData['address']);
-                $supplier->address()->associate($address);
-            } else {
-                $supplier->address->update($validatedData['address']);
-            }
+        try {
+            $data = $request->validated();
+            $supplier = $this->service->update($supplier, $data);
+            return response()->json($supplier);
+        } catch (\Throwable $exception) {
+            return response()->json($exception->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-
-        return response()->json($supplier);
     }
 
     public function destroy(Supplier $supplier): JsonResponse
     {
-        if ($supplier->address) {
-            $supplier->address->delete();
-        }
-        $supplier->delete();
-
+        $this->service->destroy($supplier);
         return response()->json(['message' => 'Supplier deleted successfully']);
     }
 }

@@ -19,7 +19,14 @@ class SupplierFactory extends Factory
             'name' => $this->faker->company,
             'identifier' => $identifier,
             'contact' => $this->faker->phoneNumber,
-            'address_id' => Address::factory()->create()->id,
+            'address_id' => null,
         ];
+    }
+
+    public function withAddress()
+    {
+        return $this->state(fn () => [
+            'address_id' => Address::factory()->create()->id,
+        ]);
     }
 }

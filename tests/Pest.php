@@ -11,9 +11,10 @@
 */
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(Tests\TestCase::class)->in('Unit', 'Feature');
-
+uses(RefreshDatabase::class);
 function fakeHttpRequest(string $uri, array $response): void
 {
     Http::fake([config('services.api_brazil.host') . $uri => Http::response($response)]);

@@ -1,23 +1,23 @@
 <?php
 
-use App\Rules\CNPJ;
+use App\Rules\CnpjCpf;
 use Database\Factories\CNPJFactory;
+use Database\Factories\CPFFactory;
 use Illuminate\Support\Facades\Validator;
 
-it('validates a valid CNPJ', function () {
-    $rule = new CNPJ();
-    expect($rule->isValid(CNPJFactory::valid()))->toBeTrue();
-})->group('cnpj-rule');
-
-it('invalidates an invalid CNPJ', function () {
-    $rule = new CNPJ();
-    expect($rule->isValid(CNPJFactory::invalid()))->toBeFalse();
-})->group('cnpj-rule');
-
-it('validates using Laravel Validator', function () {
+it('CNPJ validates using Laravel Validator', function () {
     $validator = Validator::make(
         ['cnpj' => CNPJFactory::valid()],
-        ['cnpj' => [new CNPJ()]]
+        ['cnpj' => [new CnpjCpf()]]
+    );
+
+    expect($validator->passes())->toBeTrue();
+})->group('cnpj-rule');
+
+it('CPF validates using Laravel Validator', function () {
+    $validator = Validator::make(
+        ['cpf' => CPFFactory::valid()],
+        ['cpf' => [new CnpjCpf()]]
     );
 
     expect($validator->passes())->toBeTrue();
@@ -26,7 +26,16 @@ it('validates using Laravel Validator', function () {
 it('fails with an invalid CNPJ using Laravel Validator', function () {
     $validator = Validator::make(
         ['cnpj' => CNPJFactory::invalid()],
-        ['cnpj' => [new CNPJ()]]
+        ['cnpj' => [new CnpjCpf()]]
+    );
+
+    expect($validator->fails())->toBeTrue();
+})->group('cnpj-rule');
+
+it('fails with an invalid CPF using Laravel Validator', function () {
+    $validator = Validator::make(
+        ['cpf' => CPFFactory::invalid()],
+        ['cpf' => [new CnpjCpf()]]
     );
 
     expect($validator->fails())->toBeTrue();
