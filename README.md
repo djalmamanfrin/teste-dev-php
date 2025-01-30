@@ -6,7 +6,104 @@ O objetivo deste teste é desenvolver uma API Rest para o cadastro de fornecedor
 
 ## Descrição do Projeto
 
+Este projeto utiliza **Laravel** em um ambiente **Docker** com **PHP**, **Nginx** e **MySQL**. Siga as instruções abaixo para configurar e executar a aplicação corretamente.
+
+---
+
+### 🚀 Configuração Inicial
+
+#### 1️⃣ Subindo o ambiente Docker
+Certifique-se de ter o **Docker** e **Docker Compose** instalados. Para iniciar os serviços, execute:
+
+```sh
+docker-compose up -d
+```
+Isso iniciará os contêineres do PHP, Nginx e MySQL em background.
+
+#### 2️⃣ Configuração de permissões
+Após subir os serviços, execute o seguinte comando para garantir as permissões corretas das pastas **storage** e **bootstrap/cache**:
+
+```sh
+docker exec -it php8.3-dev chmod -R 775 storage bootstrap/cache
+```
+
+Se houver erro de permissão, altere para o usuário do Docker (`www-data`) (opcional):
+
+```sh
+docker exec -it php8.3-dev chown -R www-data:www-data storage bootstrap/cache
+```
+
+#### 3️⃣ Configuração do ambiente Laravel
+Dentro do contêiner PHP, execute os seguintes comandos:
+
+```sh
+# Acesse o container
+docker exec -it php8.3-dev bash
+
+# Instale as dependências do Laravel
+composer install
+
+# Copie o arquivo de exemplo do ambiente
+cp .env.example .env
+
+# Gere a chave da aplicação
+php artisan key:generate
+
+# Execute as migrations e seeders (se necessário)
+php artisan migrate --seed
+```
+
+---
+
+### 🛠️ Executando a Aplicação
+
+Agora, a aplicação Laravel está configurada e rodando. Para acessá-la:
+
+- **Frontend (Nginx/Laravel):** [`http://localhost`](http://localhost)
+- **Banco de Dados (MySQL):**
+    - Host: `localhost` ou o ip do docker `172.17.0.1`
+    - Usuário: `root`
+    - Senha: `root`
+    - Porta: `3306`
+
+Para acessar os logs:
+```sh
+docker exec -it php8.3-dev tail -f storage/logs/laravel.log
+```
+---
+
+### 🔍 Testando a Aplicação
+
+Para rodar os testes:
+```sh
+docker exec -it php8.3-dev php artisan test
+```
+
+---
+
+### 🛑 Parando e Removendo o Ambiente
+
+Para parar os contêineres:
+```sh
+docker-compose down
+```
+
+Para remover volumes (atenção: isso apagará os dados do banco!):
+```sh
+docker-compose down -v
+```
+
+---
+
+### 📌 Observações
+- Caso precise acessar os serviços manualmente, utilize `docker exec -it php8.3-dev bash` para entrar no contêiner.
+- Modifique `php8.3-dev` conforme definido no `docker-compose.yml`.
+
+Agora, sua aplicação está pronta para teste! 🚀
+
+
 ### Backend (API Laravel):
+As rotas estão disponíves para testar na pasta `workspace`. Basta acessá-la e executar as rotas.
 
 #### CRUD de Fornecedores:
 - **Criar Fornecedor:**
