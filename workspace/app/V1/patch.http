@@ -1,0 +1,8 @@
+PATCH http://localhost/api/suppliers/{supplier}
+Content-Type: application/json
+
+{
+    "name": "Supplier Test",
+    "identifier": "12345678000195",
+    "contact": "supplier@example.com",
+}

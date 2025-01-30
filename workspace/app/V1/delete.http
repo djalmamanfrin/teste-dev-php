@@ -1,0 +1,2 @@
+DELETE http://localhost/api/suppliers/{supplier}
+Content-Type: application/json

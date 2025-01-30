@@ -1,0 +1,17 @@
+PUT http://localhost/api/suppliers/3
+Content-Type: application/json
+
+{
+    "name": "Supplier Test",
+    "identifier": "12345678000195",
+    "contact": "supplier@example.com",
+    "address": {
+        "street": "Rua Teste",
+        "number": "123",
+        "neighborhood": "Centro",
+        "city": "São Paulo",
+        "state": "SP",
+        "postal_code": "01000-000",
+        "country": "Brasil"
+    }
+}

@@ -10,8 +10,9 @@ Route::get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'suppliers'], function () {
     Route::get('/', [SupplierController::class, 'index']);
+    Route::get('/{supplier}', [SupplierController::class, 'show']);
     Route::post('/', [SupplierController::class, 'store']);
-    Route::get('{supplier}', [SupplierController::class, 'show']);
-    Route::put('{supplier}', [SupplierController::class, 'update']);
-    Route::delete('{supplier}', [SupplierController::class, 'destroy']);
+    Route::put('/{supplier}', [SupplierController::class, 'update']);
+    Route::patch('/{supplier}', [SupplierController::class, 'update']);
+    Route::delete('/{supplier}', [SupplierController::class, 'destroy']);
 });
