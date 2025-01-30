@@ -1,11 +1,19 @@
 <?php
 
 use App\Models\Supplier;
+use App\Repositories\AddressRepository;
+use App\Repositories\SupplierRepository;
 use App\Services\SupplierService;
 use Database\Factories\CNPJFactory;
 
 beforeEach(function () {
-    $this->supplierService = new SupplierService();
+    $this->supplierRepository = Mockery::mock(SupplierRepository::class);
+    $this->addressRepository = Mockery::mock(AddressRepository::class);
+
+    $this->supplierService = new SupplierService(
+        $this->supplierRepository,
+        $this->addressRepository
+    );
 });
 
 test('it can store a supplier with address', function () {
@@ -25,42 +33,74 @@ test('it can store a supplier with address', function () {
         ],
     ];
 
+    $mockSupplier = Mockery::mock(\App\Models\Supplier::class);
+    $mockAddress = Mockery::mock(\App\Models\Address::class);
+
+    $this->supplierRepository
+        ->shouldReceive('create')
+        ->once()
+        ->with(Mockery::subset($data))
+        ->andReturn($mockSupplier);
+
+    $this->addressRepository
+        ->shouldReceive('create')
+        ->once()
+        ->with(Mockery::subset($data['address']))
+        ->andReturn($mockAddress);
+
+    $mockSupplier->shouldReceive('address')->andReturnSelf();
+    $mockSupplier->shouldReceive('associate')->once()->with($mockAddress);
+    $mockSupplier->shouldReceive('save')->once();
+
     $supplier = $this->supplierService->store($data);
 
-    expect($supplier)->toBeInstanceOf(Supplier::class)
-        ->and($supplier->name)->toBe('Supplier Test')
-        ->and($supplier->identifier)->toBe($validCNPJ)
-        ->and($supplier->address)->not->toBeNull()
-        ->and($supplier->address->street)->toBe('Rua Teste');
+    expect($supplier)->toBe($mockSupplier);
 
-    $this->assertDatabaseHas('suppliers', ['id' => $supplier->id]);
-    $this->assertDatabaseHas('addresses', ['id' => $supplier->address->id]);
 })->group('supplier-service');
 
 test('it can update a supplier without address', function () {
     $validCNPJ = CNPJFactory::valid();
-    $supplier = Supplier::factory()->create();
+    $supplier = Mockery::mock(\App\Models\Supplier::class);
     $data = [
         'name' => 'Updated Supplier',
         'identifier' => $validCNPJ,
         'contact' => 'updated@example.com',
     ];
 
+    $this->supplierRepository
+        ->shouldReceive('update')
+        ->once()
+        ->with($supplier, Mockery::subset($data))
+        ->andReturn($supplier);
+
+    $supplier->shouldReceive('getAttribute')
+        ->with('address')
+        ->andReturnNull();
+
     $updatedSupplier = $this->supplierService->update($supplier, $data);
 
-    expect($updatedSupplier->name)->toBe('Updated Supplier')
-        ->and($updatedSupplier->identifier)->toBe($validCNPJ)
-        ->and($updatedSupplier->contact)->toBe('updated@example.com')
-        ->and($updatedSupplier->address)->toBeNull();
-
-    $this->assertDatabaseHas('suppliers', ['id' => $supplier->id]);
+    expect($updatedSupplier)->toBe($supplier);
 })->group('supplier-service');
 
-test('it can delete a supplier and its address', function () {
-    $supplier = Supplier::factory()->withAddress()->create();
+
+it('can delete a supplier and its address', function () {
+    $supplier = Mockery::mock(\App\Models\Supplier::class);
+    $address = Mockery::mock(\App\Models\Address::class);
+
+    $supplier->shouldReceive('getAttribute')
+        ->with('address')
+        ->andReturn($address);
+
+    $this->addressRepository
+        ->shouldReceive('delete')
+        ->once()
+        ->with($address);
+
+    $this->supplierRepository
+        ->shouldReceive('delete')
+        ->once()
+        ->with($supplier);
 
     $this->supplierService->destroy($supplier);
+});
 
-    $this->assertDatabaseMissing('suppliers', ['id' => $supplier->id]);
-    $this->assertDatabaseMissing('addresses', ['id' => $supplier->address->id]);
-})->group('supplier-service');
